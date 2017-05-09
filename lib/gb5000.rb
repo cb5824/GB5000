@@ -88,6 +88,7 @@ end
 
 ###########################################################################
 gb5000_initialize
+list = List.new
 
 puts "\nWelcome to Grocery-bot-5000!"
 
@@ -216,6 +217,64 @@ while main_selection != "4"
         end
       end
       main_selection = "0"
+    when "3" #Lists
+      puts "
+      ###########################\n
+      ########## Lists ##########\n
+      ###########################\n
+      1) View current list\n
+      2) Add recipe to list\n
+      3) Add seperate item to list\n
+      4) Print list\n
+      5) Clear list\n
+      6) Back"
+            print "\nSelection: "
+      branch_selection = gets.chomp
+
+      if ["0","1","2","3","4","5","6"].include?(branch_selection) == false
+        puts "\nI’m sorry, that is an invalid selection\n"
+        branch_selection = "0"
+      else
+        case branch_selection
+        when "1" #View current list
+          puts list.summary
+          print "\n(Press enter to continue)"
+          gets.chomp
+          branch_selection = "0"
+        when "2" #Add recipe to list
+          recipe_selection = nil
+          while recipe_selection != "0"
+            puts "List of recipes:"
+            $master_recipe_list.each_with_index do |recipe, index|
+              puts "#{index + 1}) #{recipe.name}"
+            end
+            print "\nSelect a recipe to add or enter \"0\" to go return to the previous menu: "
+            recipe_selection = gets.chomp
+            if recipe_selection != "0" && recipe_selection != nil
+              current_recipe = $master_recipe_list[(recipe_selection.to_i)-1]
+              list.recipes << current_recipe
+            end
+            branch_selection = "0"
+          end
+        when "3" #add seperate item to list
+          print "\nEnter item to add to list: "
+          item_name = gets.chomp
+          print "\nEnter quantity of #{item_name}: "
+          item_quantity = gets.chomp
+          if $master_item_list.find {|item| item.name == item_name } == nil
+            add_item(item_name)
+            gb5000_initialize
+          end
+          list.other_items[item_name] = [($master_item_list.find {|item| item.name == item_name }),item_quantity]
+          branch_selection = "0"
+        when "4" #print list
+          list.print
+          branch_selection = "0"
+        when "5" #clear
+          list = List.new
+          branch_selection = "0"
+        end
+      end
     end
   end
 end
