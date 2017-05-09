@@ -1,6 +1,7 @@
 require 'csv'
 require_relative 'ingredient'
 require_relative 'recipe'
+require_relative 'list'
 ######################################
 # To-do
 # 1) create method for generating menus
@@ -24,12 +25,13 @@ def generate_recipe_list
   contents = CSV.open("recipes.csv", "a+b", headers: true, header_converters: :symbol)
   contents.each do |row|
     ingredients = row[:ingredients].split("+")
+    quantities = row[:quantities].split("+")
     steps = row[:steps].split("+")
-    ingredient_objects = []
-    ingredients.each do |ingredient|
-      ingredient_objects << $master_item_list.find {|item| item.name == ingredient }
+    ingredient_hash = {}
+    ingredients.each_with_index do |ingredient,index|
+      ingredient_hash[ingredient] = [($master_item_list.find {|item| item.name == ingredient }),quantities[index]]
     end
-    recipes << Recipe.new(row[:name],ingredient_objects,steps)
+    recipes << Recipe.new(row[:name],ingredient_hash,steps)
   end
   recipes
 end
@@ -73,9 +75,9 @@ def add_item(name)
  end
 end
 
-def add_recipe(name,ingredients,steps)#need to update recipe class to fit this
+def add_recipe(name,ingredients,quantities,steps)
   CSV.open("recipes.csv", "a") do |csv|
-    csv << [name,ingredients,steps]
+    csv << [name,ingredients,quantities,steps]
   end
 end
 
@@ -158,8 +160,6 @@ while main_selection != "4"
         else
           case branch_selection
           when "1" #Recipe list
-            require 'pry'
-            binding.pry
             recipe_selection = nil
             while recipe_selection != "0"
               puts "List of recipes:"
@@ -170,7 +170,10 @@ while main_selection != "4"
               recipe_selection = gets.chomp
               if recipe_selection != "0"
                 current_recipe = $master_recipe_list[(recipe_selection.to_i)-1]
-                current_recipe.summary
+                puts current_recipe.summary
+                puts "\n(press ENTER to continue)"
+                gets.chomp
+                recipe_selection = "0"
               end
             end
 
@@ -179,6 +182,7 @@ while main_selection != "4"
             print "\nEnter new recipe name: "
             name = gets.chomp
             ingredients = []
+            quantities = []
             steps = []
             input = nil
             while input != ""
@@ -189,6 +193,9 @@ while main_selection != "4"
                 if $master_item_list.find {|item| item.name == input } == nil
                   add_item(input)
                 end
+                print "\nEnter quantity of #{input}: "
+                input = gets.chomp
+                quantities << input
               end
             end
             input = nil
@@ -201,7 +208,8 @@ while main_selection != "4"
             end
             ingredients = ingredients.join("+")
             steps = steps.join("+")
-            add_recipe(name,ingredients,steps)
+            quantities = quantities.join("+")
+            add_recipe(name,ingredients,quantities,steps)
             gb5000_initialize
             branch_selection = "0"
           end

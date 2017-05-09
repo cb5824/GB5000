@@ -1,5 +1,5 @@
 class List
-  def initialize(recipes)
+  def initialize(recipes, other_items = [])
   end
 
   def print

@@ -12,7 +12,7 @@ class Recipe
     @ingredients << item
   end
 
-  
+
 
   def remove_ingredients
   end
@@ -22,15 +22,15 @@ class Recipe
   end
 
   def summary
-    puts "\nIngredients:"
+    summary = ""
+    summary << "\nIngredients:"
     @ingredients.each do |name, array|
-      puts "#{name} - #{array[1]}"
+      summary << "\n#{name} - #{array[1]}"
     end
-    puts "\nInstructions:"
+    summary << "\n\nInstructions:"
     @steps.each_with_index do |text, step|
-      puts "#{step + 1}) #{text}"
+      summary << "\n#{step + 1}) #{text}"
     end
-    puts "\n(press ENTER to continue)"
-    gets.chomp
+    summary
   end
 end
