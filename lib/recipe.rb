@@ -12,7 +12,7 @@ class Recipe
     @ingredients << item
   end
 
-  end
+  
 
   def remove_ingredients
   end
@@ -30,5 +30,7 @@ class Recipe
     @steps.each_with_index do |text, step|
       puts "#{step + 1}) #{text}"
     end
+    puts "\n(press ENTER to continue)"
+    gets.chomp
   end
 end
